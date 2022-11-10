@@ -30,7 +30,7 @@ class ArticulosOrdenadosForm(forms.ModelForm):
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['proyecto','subproyecto', 'operacion','activo']
+        fields = ['proyecto','subproyecto', 'operacion','activo','superintendente','supervisor']
 
 #Sobreescribiendo el método __init__ y configurando el queryset para que esté vacío
     def __init__(self, *args, **kwargs):

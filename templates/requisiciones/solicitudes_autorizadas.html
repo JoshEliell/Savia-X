@@ -124,7 +124,6 @@
                     <th scope="col">Solicitado por</th>
                     <th scope="col">Proyecto</th>
                     <th scope="col">Subproyecto</th>
-                    <th scope="col">Artículo</th>
                     <th scope="col">Aprobado</th>
                     <th scope="col">Cantidad</th>
                     <th scope="col">Precio</th>
@@ -134,14 +133,12 @@
             <tbody>
                 {% for producto in productos %}
                 <tr>
-                    <th scope="row">{{producto.articulos.orden.folio}}</th>
-                    <td>{{producto.articulos.orden.staff.staff.first_name}} {{producto.articulos.orden.staff.staff.last_name}}</td>
-                    <td>{{producto.articulos.orden.proyecto.nombre}}</td>
-                    <td>{{producto.articulos.orden.subproyecto.nombre}}</td>
-                    <td>{{producto.articulos.producto.producto.codigo}} {{producto.articulos.producto.producto.nombre}}</td>
-                    <td>{{producto.articulos.orden.approved_at}}</td>
-                    <td>{{producto.articulos.cantidad}}</td>
-                    <td>{{producto.precio}}</td>
+                    <th scope="row">{{producto.orden.folio}}</th>
+                    <td>{{producto.orden.staff.staff.first_name}} {{producto.articulos.orden.staff.staff.last_name}}</td>
+                    <td>{{producto.orden.proyecto.nombre}}</td>
+                    <td>{{producto.orden.subproyecto.nombre}}</td>
+                    <td>{{producto.approved_at}}</td>
+                    <td>{{producto.cantidad}}</td>
                     <td>
                         <ul class="nav nav-pills">
                             <li class="nav-item mx-2">
@@ -150,7 +147,7 @@
                                 {% else %}
                                 <div class='invisible'>
                                 {% endif %}
-                                    <a type="button" class="btn btn-outline-info" href="{% url 'salida-material' producto.articulos.orden.id %}">Surtir</a>
+                                    <a type="button" class="btn btn-outline-info" href="{% url 'salida-material' producto.orden.id %}">Surtir</a>
                                 </div>
                             </li>
                         </ul>

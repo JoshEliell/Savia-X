@@ -40,13 +40,19 @@ from django.db.models import Q
 # Create your views here.
 @login_required(login_url='user-login')
 def solicitud_autorizada(request):
+    usuario = Profile.objects.get(staff__id=request.user.id)
+    #productos= Requis.objects.filter(complete=True, autorizar=None)
     #Aquí aparecen todas las ordenes, es decir sería el filtro para administrador, el objeto Q no tiene propiedad conmutativa
     #productos= ArticulosparaSurtir.objects.filter(Q(salida=False) | Q(requisitar=True), articulos__orden__autorizar = True )
-    productos= ArticulosparaSurtir.objects.filter(salida=False, articulos__orden__autorizar = True, surtir=True, articulos__producto__producto__servicio = False, articulos__orden__tipo__tipo='normal').order_by('-articulos__orden__folio')
+    
+    if usuario.tipo.nombre == 'Superintendente':
+        productos= Requis.objects.filter(complete=True, autorizar=None, orden__superintendente=usuario)
+    elif usuario.tipo.nombre == 'Almacenista':
+        productos= Requis.objects.filter(complete=True, autorizar=None)
+    else:
+        productos = Requis.objects.filter(complete=None) 
     myfilter = ArticulosparaSurtirFilter(request.GET, queryset=productos)
     productos = myfilter.qs
-
-
     #Here is where call a function to generate XLSX, using Openpyxl library
     if request.method == 'POST' and 'btnExcel' in request.POST:
 
@@ -229,7 +235,7 @@ def upload_batch_inventario(request):
 
 
 def solicitud_autorizada_firma(request):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     #Aquí aparecen todas las ordenes, es decir sería el filtro para administrador
     productos= Salidas.objects.filter(producto__articulos__orden__autorizar = True, salida_firmada=False)
     myfilter = SalidasFilter(request.GET, queryset=productos)
@@ -273,8 +279,9 @@ def salida_material_usuario(request, pk):
 @login_required(login_url='user-login')
 def solicitud_autorizada_orden(request):
     #obtengo el id de usuario, lo paso como argumento a id de profiles para obtener el objeto profile que coindice con ese usuario_id
-    usuario = request.user.id
-    perfil = Profile.objects.get(id=usuario)
+    #usuario = request.user.id
+    perfil = Profile.objects.get(staff__id=request.user.id)
+    #perfil = Profile.objects.get(id=usuario)
 
     #Este es un filtro por perfil supervisor o superintendente, es decir puede ver todo lo del distrito
     #productos= ArticulosparaSurtir.objects.filter(Q(salida=False) | Q(requisitar=True), articulos__orden__autorizar = True )
@@ -332,7 +339,7 @@ def requisicion_detalle(request, pk):
     #Vista de creación de requisición
     productos = ArticulosparaSurtir.objects.filter(articulos__orden__id = pk, requisitar= True)
     orden = Order.objects.get(id = pk)
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     requi, created = Requis.objects.get_or_create(complete=False, orden=orden)
     requis = Requis.objects.filter(orden__staff__distrito = usuario.distrito, complete = True)
     consecutivo = requis.count() + 1

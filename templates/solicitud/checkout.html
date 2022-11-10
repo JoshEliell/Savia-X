@@ -20,7 +20,95 @@
 					<hr>
 					<form method="POST" id='OrderForm' data-subproyecto-url="{% url 'ajax_load_subproyectos' %}" novalidate>
                         {% csrf_token %}
-                        {{ form|crispy }}
+                            <div class="row my-2">
+                                <label for="form.proyecto" class="col-auto col-form-label my-1"><strong>Proyecto*</strong></label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                    <!--    <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-industry"></i></span>-->
+                                    {{form.proyecto|add_class:"form-select"}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row my-2">
+                                <label for="form.subproyecto" class="col-auto col-form-label my-1"><strong>Subproyecto*</strong></label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                    <!--    <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-industry"></i></span>-->
+                                    {{form.subproyecto|add_class:"form-select"}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row my-2">
+                                <label for="form.operacion" class="col-auto col-form-label my-1"><strong>Operación*</strong></label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                    <!--    <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-industry"></i></span>-->
+                                    {{form.operacion|add_class:"form-select"}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row my-2">
+                                <label for="form.activo" class="col-auto col-form-label my-1"><strong>Activo*</strong></label>
+                                <div class="col-3">
+                                    <div class="input-group">
+                                    <!--    <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-industry"></i></span>-->
+                                    {{form.activo|add_class:"form-select"}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row my-2">
+                            <label class="col-auto col-form-label" supervisores='{{supervisores}}'><strong>Supervisor*</strong></label>
+                            <div class="col-3">
+                                <div class="input-group">
+                                <span class="input-group-text my-1" style="height:35px"><i class="fa-solid fa-user"></i></span>
+                                <div class="selector">
+                                    <select class="form-select form-select-sm my-1" style="height:35px" id="supervisores">
+                                    <option id="default_sel">      </option>
+                                    {% for supervisor in supervisores %}
+                                    <option id="js" target="{{supervisor.id}}">
+                                    {{supervisor.staff}}
+                                    </option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+
+                            <div class="row my-2">
+                            <label class="col-auto col-form-label" superintendentes='{{superintendentes}}'><strong>Superintendente*</strong></label>
+                            <div class="col-3">
+                                <div class="input-group">
+                                <span class="input-group-text my-1" style="height:35px"><i class="fa-solid fa-user"></i></span>
+                                <div class="selector">
+                                    <select class="form-select form-select-sm my-1" style="height:35px" id="superintendentes">
+                                    <option id="default_sel">      </option>
+                                    {% for superintendente in superintendentes %}
+                                    <option id="js" target="{{superintendente.id}}">
+                                    {{superintendente.staff}}
+                                    </option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                            <div class="row my-2">
+                                <label for="form.superintendente" class="col-auto col-form-label my-1 d-none"><strong>Superintendente*</strong></label>
+                                <div class="col-3 d-none">
+                                <!--<div class="input-group mb-3">-->
+                                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                    {{form.superintendente|add_class:"form-control"}}
+                                </div>
+                            </div>
+                            <div class="row my-2">
+                                <label for="form.supervisor" class="col-auto col-form-label my-1 d-none"><strong>Supervisor*</strong></label>
+                                <div class="col-3 d-none">
+                                <!--<div class="input-group mb-3">-->
+                                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                    {{form.supervisor|add_class:"form-control"}}
+                                </div>
+                            </div>
                         <input class="btn btn-outline-info btn-block my-2" name="agregar" type="submit" value="Agregar Solicitud">
                     </form>
             </div>
@@ -111,6 +199,20 @@
     myModal.addEventListener('hidden.bs.modal', function (event) {
     location.reload();
     })
+    document.getElementById("supervisores").addEventListener("change", function(event){
+    var select = document.getElementById("supervisores");
+    var current_option = select.options[select.selectedIndex];
+    var target = current_option.getAttribute('target')
+    var other_select = document.getElementById('id_supervisor')
+    other_select.value = target
+    });
+    document.getElementById("superintendentes").addEventListener("change", function(event){
+    var select = document.getElementById("superintendentes");
+    var current_option = select.options[select.selectedIndex];
+    var target = current_option.getAttribute('target')
+    var other_select = document.getElementById('id_superintendente')
+    other_select.value = target
+    });
 </script>
 {% endblock %}
 </body>

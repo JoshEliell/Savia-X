@@ -88,6 +88,8 @@
                 <tr>
                     <th scope="col">Folio</th>
                     <th scope="col">Solicitado por</th>
+                    <th scope="col">Autorización N1</th>
+                    <th scope="col">Autorización N2</th>
                     <th scope="col">Proyecto</th>
                     <th scope="col">Subproyecto</th>
                     <th scope="col">Operación</th>
@@ -100,6 +102,8 @@
                 <tr>
                     <th scope="row">{{orden.folio}}</th>
                     <td>{{orden.staff.staff.first_name}} {{orden.staff.staff.last_name}}</td>
+                    <td>{{orden.superintendente}}</td>
+                    <td>{{orden.supervisor}}</td>
                     <td>{{orden.proyecto.nombre}}</td>
                     <td>{{orden.subproyecto.nombre}}</td>
                     <td>{{orden.operacion}}</td>

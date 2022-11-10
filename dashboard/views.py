@@ -18,7 +18,8 @@ from django.db.models import Sum
 # Create your views here.
 @login_required(login_url='user-login')
 def index(request):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
+    #usuario = Profile.objects.get(id=request.user.id)
     #vale_salidas = ValeSalidas.objects.filter(material_recibido_por = usuario)
     #salidas = Salidas.objects.filter(vale_salida = vale_salidas) | No jala me marca que la búsqueda por un valor exacto debe estar limtado a un resultado no debería ser porque hay 3
     subproyectos = Subproyecto.objects.all()

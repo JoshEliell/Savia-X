@@ -6,7 +6,7 @@ from solicitudes.models import Subproyecto
 from dashboard.models import Product, Tipo_Orden
 from entradas.models import EntradaArticulo
 from .forms import InventarioForm, OrderForm, Inv_UpdateForm, ArticulosOrdenadosForm
-from user.models import Profile
+from user.models import Profile, Tipo_perfil
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 import json
@@ -38,7 +38,7 @@ def updateItem(request):
     productId = data['productId']
     action = data['action']
 
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     producto = Inventario.objects.get(id=productId)
     tipo = Tipo_Orden.objects.get(tipo ='normal')
     order, created = Order.objects.get_or_create(staff=usuario, complete=False, tipo = tipo)
@@ -79,7 +79,7 @@ def updateItemRes(request):
 #Vista de seleccion de productos, requiere login
 @login_required(login_url='user-login')
 def product_selection_resurtimiento(request):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     tipo = Tipo_Orden.objects.get(tipo ='resurtimiento')
     order, created = Order.objects.get_or_create(staff=usuario, complete=False, tipo=tipo)
     productos = Inventario.objects.filter(cantidad__lte =F('minimo'))
@@ -99,7 +99,7 @@ def product_selection_resurtimiento(request):
 #Vista de seleccion de productos, requiere login
 @login_required(login_url='user-login')
 def product_selection(request):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     tipo = Tipo_Orden.objects.get(tipo ='normal')
     order, created = Order.objects.get_or_create(staff = usuario, complete = False, tipo = tipo)
     productos = Inventario.objects.all()
@@ -137,7 +137,11 @@ def product_selection(request):
 #Vista para crear solicitud
 @login_required(login_url='user-login')
 def checkout(request):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
+    supervisor = Tipo_perfil.objects.get(nombre='Supervisor')
+    supervisores = Profile.objects.filter(tipo=supervisor)
+    superintendente = Tipo_perfil.objects.get(nombre='Superintendente')
+    superintendentes = Profile.objects.filter(tipo=superintendente)
     #Tengo que revisar primero si ya existe una orden pendiente del usuario
     orders = Order.objects.filter(staff__distrito = usuario.distrito)
     consecutivo = orders.count() + 1
@@ -175,6 +179,8 @@ def checkout(request):
         'productos':productos,
         'orden':order,
         'productosordenados':cartItems,
+        'supervisores':supervisores,
+        'superintendentes':superintendentes,
     }
     return render(request, 'solicitud/checkout.html', context)
 
@@ -198,7 +204,7 @@ def product_quantity_edit(request, pk):
 #Vista para crear solicitud
 @login_required(login_url='user-login')
 def checkout_resurtimiento(request):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     #Tengo que revisar primero si ya existe una orden pendiente del usuario
     orders = Order.objects.filter(staff__distrito = usuario.distrito, complete = False)
     consecutivo = orders.count()+1
@@ -275,8 +281,8 @@ def solicitud_pendiente(request):
 
     #El filtro de usuario, obtengo el id de usuario, busco el perfil que hace match, lo pasó como argumento
     # de filtro
-    usuario = request.user.id
-    perfil = Profile.objects.get(id=usuario)
+    #usuario = request.user.id
+    perfil = Profile.objects.get(staff__id=request.user.id)
 
     #Este es un filtro por usuario general solo puede ver sus solicitudes
     productos = ArticulosOrdenados.objects.filter(orden__complete=False, orden__staff=perfil).order_by('-orden__folio')
@@ -289,8 +295,8 @@ def solicitud_pendiente(request):
 @login_required(login_url='user-login')
 def solicitud_matriz(request):
     #obtengo el id de usuario, lo paso como argumento a id de profiles para obtener el objeto profile que coindice con ese usuario_id
-    usuario = request.user.id
-    perfil = Profile.objects.get(id=usuario)
+    #usuario = request.user.id
+    perfil = Profile.objects.get(staff__id=request.user.id)
 
 
     #Este es un filtro por perfil supervisor o superintendente, es decir puede ver todo lo del distrito
@@ -448,11 +454,13 @@ def inventario_delete(request, pk):
 @login_required(login_url='user-login')
 def solicitud_autorizacion(request):
     #obtengo el id de usuario, lo paso como argumento a id de profiles para obtener el objeto profile que coindice con ese usuario_id
-    usuario = request.user.id
-    perfil = Profile.objects.get(id=usuario)
+    #usuario = request.user.id
+    perfil = Profile.objects.get(staff__id=request.user.id)
+    #perfil = Profile.objects.get(id=usuario)
 
     #Este es un filtro por perfil supervisor o superintendente, es decir puede ver todo lo del distrito
     ordenes = Order.objects.filter(complete=True, autorizar=None, staff__distrito=perfil.distrito).order_by('-folio')
+    ordenes = ordenes.filter(supervisor=perfil)
     myfilter=SolicitudesFilter(request.GET, queryset=ordenes)
     ordenes = myfilter.qs
 
@@ -460,6 +468,7 @@ def solicitud_autorizacion(request):
     context= {
         'myfilter':myfilter,
         'ordenes':ordenes,
+        #'perfil':perfil,
         }
 
     return render(request, 'autorizacion/solicitudes_pendientes_autorizacion.html',context)
@@ -474,8 +483,9 @@ def detalle_autorizar(request, pk):
 
 @login_required(login_url='user-login')
 def autorizada_sol(request, pk):
-    usuario = request.user.id
-    perfil = Profile.objects.get(id=usuario)
+    #usuario = request.user.id
+    perfil = Profile.objects.get(staff__id=request.user.id)
+    #perfil = Profile.objects.get(id=usuario)
     order = Order.objects.get(id = pk)
     productos = ArticulosOrdenados.objects.filter(orden = pk)
     requis = Requis.objects.filter(orden__staff__distrito = perfil.distrito)
@@ -565,7 +575,7 @@ def autorizada_sol(request, pk):
             'saviax.vordcab@gmail.com',
             [order.staff.staff.email],
             )
-        order.sol_autorizada_por = Profile.objects.get(id=request.user.id)
+        order.sol_autorizada_por = Profile.objects.get(staff__id=request.user.id)
         order.save()
 
         messages.success(request, f'{perfil.staff.first_name} has autorizado la solicitud {order.folio}')
