@@ -5,6 +5,7 @@ from requisiciones.models import Requis
 from user.models import Profile
 def contadores_processor(request):
     #Por si aun no se ingresa a un perfil para que no se trabe en el login
+    usuario = Profile.objects.filter(staff__id=request.user.id).first()
     if not Profile.objects.filter(staff__id=request.user.id).first():
         productos= ArticulosparaSurtir.objects.filter(salida=False, articulos__orden__autorizar = True, articulos__producto__producto__servicio = False, articulos__orden__tipo__tipo="normal")
         ordenes_por_autorizar = Order.objects.filter(complete=True, autorizar=None)
@@ -12,9 +13,9 @@ def contadores_processor(request):
         usuario = Profile.objects.filter(staff__id=request.user.id).first()
             #productos= ArticulosparaSurtir.objects.filter(salida=False, articulos__orden__autorizar = True, articulos__producto__producto__servicio = False, articulos__orden__tipo__tipo="normal")
             #productos= productos.filter(articulos__orden__superintendente=usuario)
-        if usuario.tipo.nombre == 'Superintendente':
+        if usuario.tipo.superintendente == True:
             productos= Requis.objects.filter(complete=True, autorizar=None, orden__superintendente=usuario)
-        elif usuario.tipo.nombre == 'Almacenista':
+        elif usuario.tipo.almacenista == True:
             productos= Requis.objects.filter(complete=True, autorizar=None)
         else:
             productos = Requis.objects.filter(complete=None)           
@@ -30,5 +31,6 @@ def contadores_processor(request):
 
     return {
     'conteo_pendientes':conteo_pendientes,
-    'conteodeordenes':conteo
+    'conteodeordenes':conteo,
+    'usuario':usuario,
     }

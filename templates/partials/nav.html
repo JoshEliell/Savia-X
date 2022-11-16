@@ -23,7 +23,7 @@
                     <a class="btn btn-secondary" href="{% url 'user-logout' %}">Logout</a>
                 </li>
                 <li class="nav-item">
-                {% if usuario.tipo.crear_sol == False %}
+                {% if usuario.tipo.inicio_estadisticas == False %}
                 <div class="d-none">
                 {% else %}
                 <div>
@@ -56,7 +56,7 @@
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
-                    {% if usuario.tipo.ver_req == False %}
+                    {% if usuario.tipo.configuracion == False %}
                     <div class="d-none">
                     {% else %}
                     <div>
@@ -67,6 +67,11 @@
                             <a class="dropdown-item" href="{% url 'dashboard-product' %}">Productos/Servicios</a>
                         <div class="dropdown-divider"></div>
                     </div>
+                    {% if usuario.tipo.almacen == False %}
+                    <div class="d-none">
+                    {% else %}
+                    <div>
+                    {% endif %}
                         <h6 class="dropdown-header">Almacén</h6>
                         <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{% url 'solicitud-inventario' %}">Inventario</a>
@@ -74,7 +79,8 @@
                             <a class="dropdown-item" href="{% url 'solicitud-autorizada-firma' %}">Salidas</a>
                             <a class="dropdown-item" href="{% url 'product_selection_resurtimiento' %}">Resurtimiento: Seleccionar Productos</a>
                         <div class="dropdown-divider"></div>
-                    {% if usuario.tipo.ver_req == False %}
+                    </div>
+                    {% if usuario.tipo.solicitudes == False %}
                     <div class="d-none">
                     {% else %}
                     <div>
@@ -86,7 +92,7 @@
                             <a class="dropdown-item" href="{% url 'solicitudes-pendientes' %}">Solicitudes pendientes</a>
                         <div class="dropdown-divider"></div>
                     </div>
-                    {% if usuario.tipo.ver_sol == False %}
+                    {% if usuario.tipo.requisiciones == False %}
                     <div class="d-none">
                     {% else %}
                     <div>
@@ -102,7 +108,7 @@
                             </a>
                         <div class="dropdown-divider"></div>
                     </div>
-                    {% if usuario.tipo.ver_req == False %}
+                    {% if usuario.tipo.compras == False %}
                     <div class="d-none">
                     {% else %}
                     <div>
@@ -112,7 +118,7 @@
                             <a class="dropdown-item" href="{% url 'requisicion-autorizada' %}">Requisiciones autorizadas</a>
                         <div class="dropdown-divider"></div>
                     </div>
-                    {% if usuario.tipo.ver_req == False %}
+                    {% if usuario.tipo.tesoreria == False %}
                     <div class="d-none">
                     {% else %}
                     <div>
@@ -122,7 +128,7 @@
                             <a class="dropdown-item" href="{% url 'compras-autorizadas' %}">Compras autorizadas</a>
                         <div class="dropdown-divider"></div>
                     </div>
-                    {% if usuario.tipo.autorizar_sol == False %}
+                    {% if usuario.tipo.autorizacion == False %}
                     <div class="d-none">
                     {% else %}
                     <div>
@@ -141,7 +147,7 @@
                             <a class="dropdown-item" href="{% url 'autorizacion-oc2' %}">OC Gerencia</a>
                         <div class="dropdown-divider"></div>
                     </div>
-                    {% if usuario.tipo.ver_req == False %}
+                    {% if usuario.tipo.reportes == False %}
                     <div class="d-none">
                     {% else %}
                     <h6 class="dropdown-header">Reportes</h6>
@@ -155,7 +161,7 @@
                         <a class="dropdown-item" href="{% url 'matriz-pagos' %}">Matriz Pagos</a>
                     <div class="dropdown-divider"></div>
                     </div>
-                    {% if usuario.tipo.ver_req == False %}
+                    {% if usuario.tipo.historicos == False %}
                     <div class="d-none">
                     {% else %}
                     <h6 class="dropdown-header">Historicos</h6>

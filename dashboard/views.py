@@ -45,7 +45,7 @@ def index(request):
         pres.append(format(subproyecto.presupuesto.amount, '.2f'))
 
     context= {
-        'usuario':usuario,
+        #'usuario':usuario,
         'labels':labels,
         'data':data,
         'subproyecto':subproy,

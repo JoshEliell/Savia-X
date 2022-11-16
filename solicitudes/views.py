@@ -138,9 +138,9 @@ def product_selection(request):
 @login_required(login_url='user-login')
 def checkout(request):
     usuario = Profile.objects.get(staff__id=request.user.id)
-    supervisor = Tipo_perfil.objects.get(nombre='Supervisor')
+    supervisor = Tipo_perfil.objects.get(supervisor=True)
     supervisores = Profile.objects.filter(tipo=supervisor)
-    superintendente = Tipo_perfil.objects.get(nombre='Superintendente')
+    superintendente = Tipo_perfil.objects.get(superintendente=True)
     superintendentes = Profile.objects.filter(tipo=superintendente)
     #Tengo que revisar primero si ya existe una orden pendiente del usuario
     orders = Order.objects.filter(staff__distrito = usuario.distrito)
@@ -377,8 +377,8 @@ def inventario(request):
     return render(request,'dashboard/inventario.html', context)
 
 def inventario_add(request):
-    usuario = request.user.id
-    perfil = Profile.objects.get(id=usuario)
+    #usuario = request.user.id
+    perfil = Profile.objects.get(staff__id=request.user.id)
     productos = Inventario.objects.filter(complete = False, producto__completado = True)
     form = InventarioForm()
 

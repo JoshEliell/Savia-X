@@ -45,9 +45,9 @@ def solicitud_autorizada(request):
     #Aquí aparecen todas las ordenes, es decir sería el filtro para administrador, el objeto Q no tiene propiedad conmutativa
     #productos= ArticulosparaSurtir.objects.filter(Q(salida=False) | Q(requisitar=True), articulos__orden__autorizar = True )
     
-    if usuario.tipo.nombre == 'Superintendente':
+    if usuario.tipo.superintendente == True:
         productos= Requis.objects.filter(complete=True, autorizar=None, orden__superintendente=usuario)
-    elif usuario.tipo.nombre == 'Almacenista':
+    elif usuario.tipo.almacenista == True:
         productos= Requis.objects.filter(complete=True, autorizar=None)
     else:
         productos = Requis.objects.filter(complete=None) 
@@ -61,6 +61,7 @@ def solicitud_autorizada(request):
     context= {
         'productos':productos,
         'myfilter':myfilter,
+        'usuario':usuario,
         }
     return render(request, 'requisiciones/solicitudes_autorizadas.html',context)
 
@@ -310,12 +311,17 @@ def detalle_orden(request, pk):
 
 @login_required(login_url='user-login')
 def requisicion_autorizacion(request):
+    perfil = Profile.objects.get(staff__id=request.user.id)
     #obtengo el id de usuario, lo paso como argumento a id de profiles para obtener el objeto profile que coindice con ese usuario_id
 
     #Este es un filtro por perfil supervisor o superintendente, es decir puede ver todo lo del distrito
 
     #ordenes = Order.objects.filter(complete=True, autorizar=True, staff__distrito=perfil.distrito)
-    requis = Requis.objects.filter(autorizar=None)
+    if perfil.tipo.superintendente == True:
+        requis = Requis.objects.filter(autorizar=None, orden__superintendente=perfil)
+    else:
+        requis = Requis.objects.filter(complete=None) 
+    #requis = Requis.objects.filter(autorizar=None)
 
 
     context= {
@@ -472,7 +478,7 @@ def render_pdf_view(request, pk):
     c.drawString(370,660, orden.proyecto.nombre)
     c.drawString(370,640, orden.activo.eco_unidad)
     c.drawString(370,620, orden.operacion.nombre)
-    c.drawString(370,600, orden.sector.nombre)
+    #c.drawString(370,600, orden.sector.nombre)
     c.drawString(370,580, orden.staff.distrito.nombre)
 
 
@@ -503,14 +509,14 @@ def render_pdf_view(request, pk):
     c.drawCentredString(230,high-190, orden.staff.staff.first_name +' '+ orden.staff.staff.last_name)
     c.line(180,high-195,280,high-195)
     c.drawCentredString(230,high-205, 'Solicitado')
-    if orden.sol_autorizada_por == None:
-        c.setFillColor(rojo)
-        c.drawCentredString(410, high-190, '{Esta orden no ha sido autorizada}')
-        c.drawString(370,680, 'No aprobada')
-    else:
-        c.setFillColor(black)
-        c.drawCentredString(410,high-190, orden.sol_autorizada_por.staff.first_name+' '+ orden.staff.staff.last_name)
-        c.drawString(370,680, 'Aprobada')
+    #if orden.sol_autorizada_por == None:
+    #    c.setFillColor(rojo)
+    #    c.drawCentredString(410, high-190, '{Esta orden no ha sido autorizada}')
+    #    c.drawString(370,680, 'No aprobada')
+    #else:
+    #    c.setFillColor(black)
+    #    c.drawCentredString(410,high-190, orden.sol_autorizada_por.staff.first_name+' '+ orden.staff.staff.last_name)
+    #    c.drawString(370,680, 'Aprobada')
     c.setFillColor(black)
     c.line(360,high-195,460,high-195)
     c.drawCentredString(410,high-205,'Aprobado por')

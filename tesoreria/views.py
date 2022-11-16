@@ -22,7 +22,12 @@ from django.core.mail import EmailMessage
 # Create your views here.
 @login_required(login_url='user-login')
 def compras_autorizadas(request):
-    compras = Compra.objects.filter(autorizado2=True, pagada=False).order_by('-folio')
+    usuario = Profile.objects.get(staff__id=request.user.id)
+    if usuario.tipo.nombre == 'Compras':
+        compras = Compra.objects.filter(autorizado2=True, pagada=False).order_by('-folio')
+    else:
+        compras = Compra.objects.filter(flete=True,costo_fletes='1')
+    #compras = Compra.objects.filter(autorizado2=True, pagada=False).order_by('-folio')
     myfilter = CompraFilter(request.GET, queryset=compras)
     compras = myfilter.qs
 
@@ -36,7 +41,7 @@ def compras_autorizadas(request):
 
 @login_required(login_url='user-login')
 def compras_pagos(request, pk):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     compra = Compra.objects.get(id=pk)
     pagos = Pago.objects.filter(oc=compra.id, hecho=True).aggregate(Sum('monto'))
     sub = Subproyecto.objects.get(id=compra.req.orden.subproyecto.id)

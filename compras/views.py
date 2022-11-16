@@ -42,7 +42,12 @@ import ssl
 
 @login_required(login_url='user-login')
 def requisiciones_autorizadas(request):
-    requis = Requis.objects.filter(autorizar=True, colocada=False)
+    perfil = Profile.objects.get(staff__id=request.user.id)
+    if perfil.tipo.comprador == True:
+        requis = Requis.objects.filter(autorizar=True, colocada=False)
+    else:
+        requis = Requis.objects.filter(complete=None) 
+    #requis = Requis.objects.filter(autorizar=True, colocada=False)
 
     tag = dof()
 
@@ -138,7 +143,7 @@ def update_oc(request):
 def oc_modal(request, pk):
     productos = ArticulosRequisitados.objects.filter(req = pk, sel_comp = False)
     req = Requis.objects.get(id = pk)
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     compras = Compra.objects.all()
     oc, created = Compra.objects.get_or_create(complete = False, req = req, creada_por = usuario)
     consecutivo = compras.count() + 1
@@ -267,7 +272,12 @@ def upload_xml(request, pk):
 
 @login_required(login_url='user-login')
 def autorizacion_oc1(request):
-    compras = Compra.objects.filter(complete=True, autorizado1= None).order_by('-folio')
+    usuario = Profile.objects.get(staff__id=request.user.id)
+    if usuario.tipo.oc_superintendencia == True:
+        compras = Compra.objects.filter(complete=True, autorizado1= None).order_by('-folio')
+    else:
+        compras = Compra.objects.filter(flete=True,costo_fletes='1')
+    #compras = Compra.objects.filter(complete=True, autorizado1= None).order_by('-folio')
 
 
 
@@ -437,7 +447,7 @@ def back_oc(request, pk):
 
 
 def autorizar_oc1(request, pk):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     compra = Compra.objects.get(id = pk)
     productos = ArticuloComprado.objects.filter(oc=pk)
 
@@ -481,8 +491,12 @@ def autorizar_oc1(request, pk):
 
 @login_required(login_url='user-login')
 def autorizacion_oc2(request):
-
-    compras = Compra.objects.filter(complete = True, autorizado1 = True, autorizado2= None).order_by('-folio')
+    usuario = Profile.objects.get(staff__id=request.user.id)
+    if usuario.tipo.oc_gerencia == True:
+        compras = Compra.objects.filter(complete = True, autorizado1 = True, autorizado2= None).order_by('-folio')
+    else:
+        compras = Compra.objects.filter(flete=True,costo_fletes='1')
+    #compras = Compra.objects.filter(complete = True, autorizado1 = True, autorizado2= None).order_by('-folio')
 
     context= {
         'compras':compras,
@@ -492,7 +506,7 @@ def autorizacion_oc2(request):
 
 
 def autorizar_oc2(request, pk):
-    usuario = Profile.objects.get(id=request.user.id)
+    usuario = Profile.objects.get(staff__id=request.user.id)
     compra = Compra.objects.get(id = pk)
     productos = ArticuloComprado.objects.filter(oc=pk)
 
